@@ -12,6 +12,8 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 
+use std::sync::{Arc, Mutex};
+
 #[tokio::main]
 async fn main() {
     // initialize tracing
@@ -24,12 +26,26 @@ async fn main() {
         // `POST /users` goes to `create_user`
         .route("/users", post(create_user));
 
+    let (shutdown, rx) = tokio::sync::oneshot::channel::<()>();
+    let shutdown = Arc::new(Mutex::new(Some(shutdown)));
+
+    ctrlc::set_handler(move || {
+        if let Some(shutdown) = shutdown.lock().unwrap().take() {
+            shutdown.send(()).expect("TODO: panic message");
+        }
+    })
+        .expect("Error setting Ctrl-C handler");
+
+
+
     // run our app with hyper
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
         .await
         .unwrap();
     tracing::debug!("listening on {}", listener.local_addr().unwrap());
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app).with_graceful_shutdown(async move {
+        let _ = rx.await;
+    }).await.unwrap();
 }
 
 // basic handler that responds with a static string
