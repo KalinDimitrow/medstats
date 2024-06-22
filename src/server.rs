@@ -4,13 +4,17 @@ use std::time::Duration;
 use tower_http::timeout::TimeoutLayer;
 
 use crate::endpoints::hellowold;
+use crate::endpoints::test;
 
 fn tracing_config() {
     tracing_subscriber::fmt::init();
 }
 
 fn create_app() -> Router {
-    Router::new().merge(hellowold::hello_router()).layer((
+    Router::new()
+        .merge(hellowold::hello_router())
+        .merge(test::test_router())
+        .layer((
         // Graceful shutdown will wait for outstanding requests to complete. Add a timeout so
         // requests don't hang forever.
         TimeoutLayer::new(Duration::from_secs(10)),
