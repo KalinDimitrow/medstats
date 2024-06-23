@@ -3,43 +3,34 @@
 
 use axum::{
     async_trait,
-    BoxError,
     extract::Json,
-    routing::{get, post},
     body::{HttpBody, Body},
-    Router,
-    response::{IntoResponse, Response},
+    response::IntoResponse,
     http::{StatusCode},
-    extract::{rejection::*, FromRequest, FromRequestParts, Request},
+    extract::{FromRequest, FromRequestParts, Request},
     RequestExt
 };
 
 use serde::{Serialize, Deserialize};
 use validator::{Validate, ValidationError};
-
-pub fn test_router() -> Router {
-    Router::new()
-        .route("/json", get(get_json))
-        .route("/validate_json", get(validated_json))
-}
 // Example of how to use Json extractor to parse the body of request
 // and return json as a body of response
-async fn get_json(Json(payload): Json<TestJason>) -> impl IntoResponse {
+pub async fn get_json(Json(payload): Json<TestJason>) -> impl IntoResponse {
 
     (StatusCode::OK, Json(payload)).into_response()
 }
 
-async fn validated_json(user: ExtractAndValidateUser) -> impl IntoResponse {
+pub async fn validated_json(user: ExtractAndValidateUser) -> impl IntoResponse {
     (StatusCode::OK, Json(user)).into_response()
 }
 
 #[derive(Serialize, Deserialize,Clone)]
-struct TestJason {
+pub struct TestJason {
     data: String
 }
 
 #[derive(Debug, Deserialize, Serialize, Validate)]
-struct ExtractAndValidateUser {
+pub struct ExtractAndValidateUser {
     #[validate(email)]
     user : String,
     #[validate(length(min = 8), custom(function = "custom_validation_func"))]

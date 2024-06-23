@@ -1,3 +1,2 @@
 pub mod hellowold;
-
-pub mod test;
+pub mod examples;
