@@ -1,6 +1,7 @@
 pub mod validate_json;
 mod path_extraction;
 mod request_params;
+mod headers;
 
 use axum::{
     routing::{get, post},
@@ -13,4 +14,5 @@ pub fn router() -> Router {
         .route("/validate_json", get(validate_json::validated_json))
         .route("/path/:some_id", get(path_extraction::path_extraction))
         .route("/request_params", get(request_params::request_params))
+        .route("/get_headers", get(headers::headers))
 }
