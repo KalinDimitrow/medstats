@@ -2,23 +2,29 @@ pub mod validate_json;
 mod path_extraction;
 mod request_params;
 mod headers;
+mod shared_data;
 
-use axum::{
-    routing::{get, post},
-    Router,
-};
+use axum::{routing::{get, post}, Router, Extension};
 use axum::http::Method;
 use tower_http::cors::{CorsLayer, Any};
+#[derive(Clone)]
+struct SharedData {
+    message: String
+}
 
 pub fn router() -> Router {
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST])
         .allow_origin(Any);
+
+    let shared_data = SharedData{ message: "some message".to_owned() };
     Router::new()
         .route("/json", get(validate_json::get_json))
         .route("/validate_json", get(validate_json::validated_json))
         .route("/path/:some_id", get(path_extraction::path_extraction))
         .route("/request_params", get(request_params::request_params))
         .route("/get_headers", get(headers::headers))
+        .route("/shared_data", get(shared_data::shared_data))
+        .layer(Extension(shared_data))
         .layer(cors)
 }
