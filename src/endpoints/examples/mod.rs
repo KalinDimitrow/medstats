@@ -3,9 +3,15 @@ mod path_extraction;
 mod request_params;
 mod headers;
 mod shared_data;
+mod custom_middware;
 
-use axum::{routing::{get, post}, Router, Extension};
-use axum::http::Method;
+use axum::{
+    routing::{get},
+    Router,
+    Extension,
+    http::Method,
+    middleware::from_fn
+};
 use tower_http::cors::{CorsLayer, Any};
 #[derive(Clone)]
 struct SharedData {
@@ -27,4 +33,7 @@ pub fn router() -> Router {
         .route("/shared_data", get(shared_data::shared_data))
         .layer(Extension(shared_data))
         .layer(cors)
+        .merge(Router::new()
+            .route("/custom_header", get(custom_middware::read_custom_header))
+            .layer(from_fn(custom_middware::custom_header)))
 }

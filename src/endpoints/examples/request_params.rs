@@ -17,7 +17,7 @@ pub struct ValidatedParams {
 }
 pub async fn request_params(Query(params) : Query<ValidatedParams>) -> impl IntoResponse {
     match params.validate() {
-        Ok(params) => {
+        Ok(_params) => {
             (StatusCode::OK,  format!(""))
         }
         Err(errors) => {
