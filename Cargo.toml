@@ -1,23 +1,10 @@
-[package]
-name = "medstats"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+resolver = "2"
+members = [
+    "axum-old", "backend",
+]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-axum = "0.7.5"
-tower = { version = "0.4.13", features = ["util"] }
-tower-http = { version = "0.5", features = ["cors", "timeout", "trace"] }
-tokio = { version = "1.38.0", features = ["full"] }
-serde = { version = "1.0", features = ["derive"] }
 
-serde_json = "1.0.117"
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-validator = { version = "0.18.1", features = ["derive"] }
-
-sqlx = {version = "0.7.4", features = ["runtime-tokio", "tls-native-tls", "postgres", "macros"]}
-dotenvy = "0.15.7"
 
 
