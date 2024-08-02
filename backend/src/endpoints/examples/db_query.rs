@@ -36,5 +36,7 @@ pub async fn simple_query(
 
     let result = json!(result);
 
-    Ok::<HttpResponse, CustomError>(HttpResponse::Ok().body(format!("Hey there! {:?}", result)))
+    Ok::<HttpResponse, CustomError>(
+        HttpResponse::Ok().body(format!("Hey there!!!!!! {:?}", result)),
+    )
 }
