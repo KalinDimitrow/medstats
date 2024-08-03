@@ -7,6 +7,7 @@ use diesel::{pg::PgConnection, prelude::*, r2d2, r2d2::ConnectionManager};
 
 use anyhow::Error;
 use std::sync::Arc;
+pub mod errors;
 pub mod models;
 pub mod schema;
 
