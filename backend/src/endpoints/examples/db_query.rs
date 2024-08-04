@@ -1,5 +1,5 @@
-use crate::models::User;
-use crate::schema::user::dsl::*;
+use crate::db::models::user::User; //user::dsl::*;
+use crate::db::schema::user::dsl::*;
 use crate::DB;
 use actix_web::{error, web, HttpResponse, Responder};
 use derive_more::{Display, Error};
