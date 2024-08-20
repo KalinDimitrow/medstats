@@ -1,11 +1,15 @@
+use actix_session::{storage::CookieSessionStore, SessionMiddleware};
 use actix_web::{
     body::MessageBody,
+    cookie::{time, Key},
     dev::{ServiceFactory, ServiceResponse},
     web, App,
 };
-use diesel::{pg::PgConnection, prelude::*, r2d2, r2d2::ConnectionManager};
+
+use actix_session::config::PersistentSession;
 
 use anyhow::Error;
+use diesel::{pg::PgConnection, prelude::*, r2d2, r2d2::ConnectionManager};
 use std::sync::Arc;
 pub mod db;
 pub mod endpoints;
@@ -37,7 +41,20 @@ pub fn create_app(
         InitError = (),
     >,
 > {
+    let master_key: &Vec<u8> = &(0..32).collect();
+    let secret_key = Key::derive_from(master_key);
+
     App::new()
         .app_data(web::Data::new(pool))
+        .wrap(
+            SessionMiddleware::builder(CookieSessionStore::default(), secret_key.clone())
+                .session_lifecycle(
+                    PersistentSession::default().session_ttl(time::Duration::days(5)),
+                )
+                .build(),
+            // SessionMiddleware::new(
+            // CookieSessionStore::default(),
+            // secret_key.clone(),
+        )
         .configure(endpoints::scoped_config)
 }

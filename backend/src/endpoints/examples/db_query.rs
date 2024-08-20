@@ -10,6 +10,7 @@ use diesel::{
     r2d2::{ConnectionManager, PooledConnection},
 };
 
+use actix_session::{storage::CookieSessionStore, SessionMiddleware};
 use serde_json::json;
 use std::fmt::format;
 use std::ops::{Deref, DerefMut};

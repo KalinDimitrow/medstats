@@ -6,6 +6,9 @@ use serde::Deserialize;
 use serde_json::json;
 use std::fmt;
 
+use actix_session::{storage::CookieSessionStore, SessionGetError, SessionMiddleware};
+use diesel::r2d2::PoolError;
+
 #[derive(Debug, Deserialize)]
 pub struct Error {
     pub status_code: u16,
@@ -33,6 +36,22 @@ impl From<DieselError> for Error {
             DieselError::DatabaseError(_, err) => Error::new(409, err.message().to_string()),
             DieselError::NotFound => Error::new(404, "Record not found".to_string()),
             err => Error::new(500, format!("Diesel error: {}", err)),
+        }
+    }
+}
+
+impl From<PoolError> for Error {
+    fn from(error: PoolError) -> Self {
+        match error {
+            _ => Error::new(500, format!("Diesel error: {}", error)),
+        }
+    }
+}
+
+impl From<SessionGetError> for Error {
+    fn from(error: SessionGetError) -> Self {
+        match error {
+            _ => Error::new(500, format!("Session error: {}", error)),
         }
     }
 }
