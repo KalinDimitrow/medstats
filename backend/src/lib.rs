@@ -30,6 +30,14 @@ pub async fn configure_database() -> Result<DB, Error> {
     Ok(Arc::new(db))
 }
 
+fn configure_session() -> SessionMiddleware<CookieSessionStore> {
+    let master_key: &Vec<u8> = &(0..32).collect();
+    let secret_key = Key::derive_from(master_key);
+    SessionMiddleware::builder(CookieSessionStore::default(), secret_key.clone())
+        .session_lifecycle(PersistentSession::default().session_ttl(time::Duration::days(5)))
+        .build()
+}
+
 pub fn create_app(
     pool: DB,
 ) -> App<
@@ -41,20 +49,8 @@ pub fn create_app(
         InitError = (),
     >,
 > {
-    let master_key: &Vec<u8> = &(0..32).collect();
-    let secret_key = Key::derive_from(master_key);
-
     App::new()
         .app_data(web::Data::new(pool))
-        .wrap(
-            SessionMiddleware::builder(CookieSessionStore::default(), secret_key.clone())
-                .session_lifecycle(
-                    PersistentSession::default().session_ttl(time::Duration::days(5)),
-                )
-                .build(),
-            // SessionMiddleware::new(
-            // CookieSessionStore::default(),
-            // secret_key.clone(),
-        )
+        .wrap(configure_session())
         .configure(endpoints::scoped_config)
 }
